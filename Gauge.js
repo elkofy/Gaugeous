@@ -1,9 +1,41 @@
+/**
+ * CONSTANTS
+ */
 const svgns = "http://www.w3.org/2000/svg";
+/**
+ * UTILITARIES
+ */
+ function initSvg(listsvg) {
+  var svgs = [];
+  listsvg.forEach((elem) => {
+    svgs.push(document.createElementNS(svgns, elem));
+  });
+  return svgs;
+}
+function Rect(rect, obj) {
+  for (prop in obj) {
+    rect.setAttribute(prop, obj[prop]);
+  }
+  return rect;
+}
+function SvgContainer(svg, obj) {
+  for (prop in obj) {
+    svg.setAttribute(prop, obj[prop]);
+  }
+  return svg;
+}
+function printSpacers() {
+  console.log("---------------------------------------------");
+}
+/**
+ * CLASS
+ */
 
 class Gauge {
-  constructor(id = "test", options = [0, 1, 2]) {
+  constructor(id = "test", type, value) {
     this.id = id;
-    this.options = options;
+    this.type = type;
+    this.value = value;
   }
   Test() {
     printSpacers();
@@ -12,118 +44,89 @@ class Gauge {
     printSpacers();
   }
   Draw() {
-    //initGauge();
-    let svg_gauge = document.createElementNS(svgns, "svg");
+    let currentgauge;
+    switch (this.type) {
+      case "lvlgauge":
+        var lvl = new lvlGauge(this.value);
+        currentgauge = lvl.getsvg();
+        break;
+      default:
+        break;
+    }
+    let svg_gauge = currentgauge;
     svg_gauge.id = "svgauge";
     let id2append = document.getElementById(this.id);
     id2append.innerHTML = "";
     id2append.appendChild(svg_gauge);
   }
 }
-function printSpacers() {
-  console.log("---------------------------------------------");
-}
 
-class Options {
-  constructor(width, height, scale, orientation, type) {
-    this.width = width;
-    this.height = height;
-    this.scale = scale;
-    this.orientation = orientation;
-    this.type = type;
+class lvlGauge {
+  constructor(value = 0, options = "none") {
+    this.value = value;
+    this.options = options;
   }
-  Test() {
-    printSpacers();
-    console.log("width : " + this.width);
-    console.log("height : " + this.height);
-    console.log("scale : " + this.scale);
-    console.log("orientation : " + this.orientation);
-    console.log("type : " + Object.values(this.type));
-    printSpacers();
-  }
-  getSvg() {
-    console.log(this.type.getGauge());
-  }
-}
-
-class Type {
-  constructor(name, colors, radius, svg) {
-    this.name = name;
-    this.colors = colors;
-    this.radius = radius;
-    this.svg = svg;
-  }
-  Test() {
-    printSpacers();
-    console.log("name : " + this.name);
-    console.log("colors : " + this.colors);
-    console.log("radius : " + this.radius);
-    console.log("svg : " + this.svg);
-    printSpacers();
-  }
-
-  getGauge() {
-    var gauge;
-    switch (this.name) {
-      case "linear_prgss_gauge":
-        gauge = this.getLinearProgressGauge();
-        console.log("Progress gauge", gauge);
-        break;
-      case "linear_grad_gauge":
-        gauge = this.getLinearGradGauge();
-        console.log("Gradient gauge", gauge);
-        break;
-      case "linear_lvl_gauge":
-        gauge = this.getLinearLvlGauge();
-        console.log("Lvl gauge", gauge);
-        break;
-      default:
-        gauge = getLinearProgressGauge();
-        console.log(gauge);
-        break;
+  getsvg() {
+    let svgelem = initSvg(["svg", "rect", "rect"]);
+    let props = {
+      GaugeW: 200,
+      GaugeH: 40,
+      GaugeX: 10,
+      GaugeY: 10,
+      GaugeRY:20
+    };
+    let gaugeval = (props["GaugeW"] * this.value) / 10;
+    let colors = ["red", "yellow", "green"];
+    let currentcolor = colors[0];
+    if (this.value > 4) {
+      currentcolor = colors[1];
+      if (this.value > 7) {
+        currentcolor = colors[2];
+      }
     }
-  }
-  getLinearProgressGauge() {
-    
-    return "linear_prgss_gauge";
-  }
-  getLinearGradGauge() {
-    return "linear_grad_gauge";
-  }
-  getLinearLvlGauge() {
-    return "linear_lvl_gauge";
+    svgelem[0] = SvgContainer(svgelem[0], {
+      id: "lvlgauge",
+      width: 400,
+      height: 200,
+    });
+
+    svgelem[1] = Rect(svgelem[1], {
+      id: "lvlgauge",
+      width: props["GaugeW"],
+      height: props["GaugeH"],
+      x: props["GaugeX"],
+      y: props["GaugeY"],
+      fill: "grey",
+      ry: props['GaugeRY'],
+    });
+
+    if (this.value > 10) {
+      gaugeval = props["GaugeW"];
+    }
+    if (this.value == 1) {
+      gaugeval += 5;
+    }
+
+    svgelem[2] = Rect(svgelem[2], {
+      id: "lvlgauge",
+      width: gaugeval,
+      height: props["GaugeH"],
+      x: props["GaugeX"],
+      y: props["GaugeY"],
+      fill: currentcolor,
+      ry: props['GaugeRY'],
+    });
+
+    svgelem[0].appendChild(svgelem[1]);
+    svgelem[0].appendChild(svgelem[2]);
+
+    return svgelem[0];
   }
 }
 
-// function initGauge() {
-//   var defs = document.createElementNS(svgns, "defs");
-//   var svg_gauge = document.createElementNS(svgns, "svg");
-//   var svg_bgauge = document.createElementNS(svgns, "rect");
-//   var svg_gradient = document.createElementNS(svgns, "linearGradient");
-//   var svg_line = document.createElementNS(svgns, "line");
-//   var svg_polygon = document.createElementNS(svgns, "polygon");
-// }
 
-let test_Type = new Type("linear_lvl_gauge", [1, 1, 3, 4], 5, "svg");
-printSpacers();
-test_Type.getGauge();
-printSpacers();
-
-let test_opt = new Options(400, 600, 1, "l", test_Type);
-
-let test_gauge = new Gauge("test");
-let test_gauge2 = new Gauge("id", test_opt);
-
-test_gauge.Test();
-test_gauge.Draw();
-
-printSpacers();
-test_opt.getSvg();
-
-/* setInterval(() => {
-  test_gauge.Draw();
-}, 1000); */
-
-test_gauge2.Test();
-test_opt.Test();
-test_opt.Test();
+/**
+ * TESTS
+ */
+var gauge = new Gauge("test", "lvlgauge",1);
+gauge.Draw();
