@@ -32,10 +32,11 @@ function printSpacers() {
  */
 
 class Gauge {
-  constructor(id = "test", type, value) {
+  constructor(id = "test", type, value ,options = [1]) {
     this.id = id;
     this.type = type;
     this.value = value;
+    this.options = options;
   }
   Test() {
     printSpacers();
@@ -47,7 +48,11 @@ class Gauge {
     let currentgauge;
     switch (this.type) {
       case "lvlgauge":
-        var lvl = new lvlGauge(this.value);
+        var lvl = new lvlGauge(this.value,this.options);
+        currentgauge = lvl.getsvg();
+        break;
+        case "markergauge":
+        var lvl = new markerGauge(this.value,this.options);
         currentgauge = lvl.getsvg();
         break;
       default:
@@ -62,9 +67,10 @@ class Gauge {
 }
 
 class lvlGauge {
-  constructor(value = 0, options = "none") {
+  constructor(value = 0, options = [1] , references = []) {
     this.value = value;
     this.options = options;
+    this.references = references;
   }
   getsvg() {
     let svgelem = initSvg(["svg", "rect", "rect"]);
@@ -88,6 +94,7 @@ class lvlGauge {
       id: "lvlgauge",
       width: 400,
       height: 200,
+      transform: 'scale(' + this.options[0] + ')',
     });
 
     svgelem[1] = Rect(svgelem[1], {
@@ -123,10 +130,55 @@ class lvlGauge {
     return svgelem[0];
   }
 }
+class markerGauge {
+  constructor(value = 0, options = [1]) {
+    this.value = value;
+    this.options = options;
+  }
+  getsvg() {
+    let svgelem = initSvg(["svg", "rect", "rect"]);
+    let refs = initSvg(["rect", "text"]);
+    let cursorval = initSvg(["rect","text"]);
+
+    let props = {
+      GaugeW: 200,
+      GaugeH: 40,
+      GaugeX: 10,
+      GaugeY: 10,
+      GaugeRY:5
+    };
+    svgelem[0] = SvgContainer(svgelem[0], {
+      id: "markergauge",  // id of the svg element
+      width: 400, // width of the svg element  
+      height: 200, // height of the svg element
+      transform: 'scale(' + this.options[0] + ')',
+    });
+    svgelem[1] = Rect(svgelem[1], { // rectangle
+      width: props["GaugeW"], // width of the rectangle
+      height: props["GaugeH"], // height of the rectangle
+      x: props["GaugeX"], // x position of the rectangle
+      y: props["GaugeY"], // y position of the rectangle
+      fill: "grey", // fill color of the rectangle
+      ry: props['GaugeRY'],
+    });
+    svgelem[2] = Rect(svgelem[2], { // rectangle
+      width: props["GaugeW"], // width of the rectangle
+      height: props["GaugeH"], // height of the rectangle
+      x: props["GaugeX"], // x position of the rectangle
+      y: props["GaugeY"], // y position of the rectangle
+      fill: "grey", // fill color of the rectangle
+      ry: props['GaugeRY'],
+    });
+
+
+    }
+  }
+
+
 
 
 /**
  * TESTS
  */
-var gauge = new Gauge("test", "lvlgauge",1);
+var gauge = new Gauge("test", "lvlgauge",1,[1]);
 gauge.Draw();
