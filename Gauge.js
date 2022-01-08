@@ -5,12 +5,33 @@ const svgns = "http://www.w3.org/2000/svg";
 /**
  * UTILITARIES
  */
- function initSvg(listsvg) {
+function initTextnodes(listnodes) {
+  var txtNodes = [];
+  listnodes.forEach((elem) => {
+    txtNodes.push(document.createTextNode(elem));
+  });
+  return txtNodes;
+}
+function initSvg(listsvg) {
   var svgs = [];
   listsvg.forEach((elem) => {
     svgs.push(document.createElementNS(svgns, elem));
   });
   return svgs;
+}
+function SVGText(text, obj) {
+  for (prop in obj) {
+    text.setAttribute(prop, obj[prop]);
+  }
+  return text;
+}
+function initSvgs(params, num) {
+  var multsvgs = [];
+  for (let i = 0; i < num; i++) {
+    let tempsvg = initSvg(params);
+    multsvgs.push(tempsvg);
+  }
+  return multsvgs;
 }
 function Rect(rect, obj) {
   for (prop in obj) {
@@ -24,6 +45,14 @@ function SvgContainer(svg, obj) {
   }
   return svg;
 }
+function findLoc(el, arr, st, en) {
+  st = st || 0;
+  en = en || arr.length;
+  for (i = 0; i < arr.length; i++) {
+    if (arr[i] > el) return i;
+  }
+  return en;
+}
 function printSpacers() {
   console.log("---------------------------------------------");
 }
@@ -32,7 +61,7 @@ function printSpacers() {
  */
 
 class Gauge {
-  constructor(id = "test", type, value ,options = [1]) {
+  constructor(id = "test", type, value, options = [1]) {
     this.id = id;
     this.type = type;
     this.value = value;
@@ -48,11 +77,11 @@ class Gauge {
     let currentgauge;
     switch (this.type) {
       case "lvlgauge":
-        var lvl = new lvlGauge(this.value,this.options);
+        var lvl = new lvlGauge(this.value, this.options);
         currentgauge = lvl.getsvg();
         break;
-        case "markergauge":
-        var lvl = new markerGauge(this.value,this.options);
+      case "markergauge":
+        var lvl = new markerGauge(this.value, this.options);
         currentgauge = lvl.getsvg();
         break;
       default:
@@ -67,7 +96,7 @@ class Gauge {
 }
 
 class lvlGauge {
-  constructor(value = 0, options = [1] , references = []) {
+  constructor(value = 0, options = [1], references = []) {
     this.value = value;
     this.options = options;
     this.references = references;
@@ -79,7 +108,7 @@ class lvlGauge {
       GaugeH: 40,
       GaugeX: 10,
       GaugeY: 10,
-      GaugeRY:20
+      GaugeRY: 20,
     };
     let gaugeval = (props["GaugeW"] * this.value) / 10;
     let colors = ["red", "yellow", "green"];
@@ -94,7 +123,7 @@ class lvlGauge {
       id: "lvlgauge",
       width: 400,
       height: 200,
-      transform: 'scale(' + this.options[0] + ')',
+      transform: "scale(" + this.options[0] + ")",
     });
 
     svgelem[1] = Rect(svgelem[1], {
@@ -104,7 +133,7 @@ class lvlGauge {
       x: props["GaugeX"],
       y: props["GaugeY"],
       fill: "grey",
-      ry: props['GaugeRY'],
+      ry: props["GaugeRY"],
     });
 
     if (this.value > 10) {
@@ -121,7 +150,7 @@ class lvlGauge {
       x: props["GaugeX"],
       y: props["GaugeY"],
       fill: currentcolor,
-      ry: props['GaugeRY'],
+      ry: props["GaugeRY"],
     });
 
     svgelem[0].appendChild(svgelem[1]);
@@ -130,55 +159,112 @@ class lvlGauge {
     return svgelem[0];
   }
 }
+
 class markerGauge {
-  constructor(value = 0, options = [1]) {
+  constructor(value = [0, 100, 55, 35, 50], options = [1]) {
     this.value = value;
     this.options = options;
   }
   getsvg() {
-    let svgelem = initSvg(["svg", "rect", "rect"]);
-    let refs = initSvg(["rect", "text"]);
-    let cursorval = initSvg(["rect","text"]);
-
     let props = {
       GaugeW: 200,
       GaugeH: 40,
       GaugeX: 10,
       GaugeY: 10,
-      GaugeRY:5
+      GaugeRY: 5,
     };
-    svgelem[0] = SvgContainer(svgelem[0], {
-      id: "markergauge",  // id of the svg element
-      width: 400, // width of the svg element  
-      height: 200, // height of the svg element
-      transform: 'scale(' + this.options[0] + ')',
-    });
-    svgelem[1] = Rect(svgelem[1], { // rectangle
-      width: props["GaugeW"], // width of the rectangle
-      height: props["GaugeH"], // height of the rectangle
-      x: props["GaugeX"], // x position of the rectangle
-      y: props["GaugeY"], // y position of the rectangle
-      fill: "grey", // fill color of the rectangle
-      ry: props['GaugeRY'],
-    });
-    svgelem[2] = Rect(svgelem[2], { // rectangle
-      width: props["GaugeW"], // width of the rectangle
-      height: props["GaugeH"], // height of the rectangle
-      x: props["GaugeX"], // x position of the rectangle
-      y: props["GaugeY"], // y position of the rectangle
-      fill: "grey", // fill color of the rectangle
-      ry: props['GaugeRY'],
-    });
+    let propsmarkers = {
+      GaugeW: 5,
+      GaugeH: 40,
+      GaugeX: 10,
+      GaugeY: 10,
+      GaugeRY: 3,
+    };
+    let svgelem = initSvg(["svg", "rect", "rect"]);
+    let markers = this.value.slice(3, this.value.length).sort();
+    console.log(markers);
+    var textnodes = initTextnodes([...markers, this.value[2]]);
 
+    let svgmarkers = initSvgs(["rect", "text"], markers.length);
+    var xval = (this.value[2] * props["GaugeW"]) / this.value[1];
 
+    for (let svgmki = 0; svgmki < svgmarkers.length; svgmki++) {
+      var mkval = (markers[svgmki] * props["GaugeW"]) / this.value[1];
+
+      svgmarkers[svgmki].forEach((element, idx) => {
+        if (idx == 0) {
+          element = Rect(element, {
+            width: propsmarkers["GaugeW"],
+            height: propsmarkers["GaugeH"],
+            x: mkval + propsmarkers["GaugeW"],
+            y: propsmarkers["GaugeY"],
+            fill: "red",
+            ry: propsmarkers["GaugeRY"],
+          });
+        } else {
+          element = SVGText(element, {
+            width: propsmarkers["GaugeW"],
+            height: propsmarkers["GaugeH"],
+            x: mkval + propsmarkers["GaugeW"],
+            y: propsmarkers["GaugeY"] * 2 + 5 + propsmarkers["GaugeH"],
+            fill: "black",
+            ry: propsmarkers["GaugeRY"],
+          });
+        }
+        element.appendChild(textnodes[svgmki]);
+      });
     }
+
+    svgelem[0] = SvgContainer(svgelem[0], {
+      id: "markergauge",
+      width: 400, 
+      height: 200, 
+      transform: "scale(" + this.options[0] + ")",
+    });
+    svgelem[1] = Rect(svgelem[1], {
+      // rectangle
+      width: props["GaugeW"], // width of the rectangle
+      height: props["GaugeH"], // height of the rectangle
+      x: props["GaugeX"], // x position of the rectangle
+      y: props["GaugeY"], // y position of the rectangle
+      fill: "grey", // fill color of the rectangle
+      ry: props["GaugeRY"],
+    });
+    svgelem[2] = Rect(svgelem[2], {
+      // rectangle
+      width: xval,
+      height: props["GaugeH"], 
+      x: props["GaugeX"], 
+      y: props["GaugeY"], 
+      fill: "blue", 
+      ry: props["GaugeRY"],
+    });
+    svgelem[0].appendChild(svgelem[1]);
+    svgelem[0].appendChild(svgelem[2]);
+
+    for (let svgmk = 0; svgmk < svgmarkers.length; svgmk++) {
+      svgmarkers[svgmk].forEach((element) => {
+        svgelem[0].appendChild(element);
+      });
+    }
+    // svgelem[0].appendChild(svgmarkers[0][0]);
+
+    return svgelem[0];
   }
-
-
-
+}
 
 /**
  * TESTS
  */
-var gauge = new Gauge("test", "lvlgauge",1,[1]);
+
+//Gauge one to ten with scale 1
+var gauge = new Gauge("test", "lvlgauge", 1, [1]);
 gauge.Draw();
+//Gauge one to ten with scale 1
+var marked_gauge = new Gauge(
+  "testmarker",
+  "markergauge",
+  [0, 100, 28, 30, 50, 70, 90],
+  [1]
+);
+marked_gauge.Draw();
