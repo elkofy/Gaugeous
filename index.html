@@ -10,12 +10,17 @@
     <div id="app">
       <div>
         <h1>Gaugeous</h1>
-        
-        <script type="module">
-          // This is to test gauges
-        </script>
+        <div id="GaugeContainer"></div>
       </div>
     </div>
+
     <script type="module" src="/src/index.ts"></script>
+    <script type="module">
+      import { SimpleGauge } from "./src/index.ts";
+      const gauge = new SimpleGauge(10, 100);
+      const gaugeContainer = document.getElementById("GaugeContainer");
+      gauge.render(gaugeContainer);
+      console.log("test");
+    </script>
   </body>
 </html>
