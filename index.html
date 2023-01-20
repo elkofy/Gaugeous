@@ -18,9 +18,19 @@
     <script type="module">
       import { SimpleGauge } from "./src/index.ts";
       const gauge = new SimpleGauge(10, 100);
+      const gauge2 = new SimpleGauge(20, 100);
+
       const gaugeContainer = document.getElementById("GaugeContainer");
       gauge.render(gaugeContainer);
-      console.log("test");
+      gauge2.render(gaugeContainer);
     </script>
+
+    <style>
+      #GaugeContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+    </style>
   </body>
 </html>

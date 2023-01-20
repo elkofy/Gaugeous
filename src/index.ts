@@ -1,3 +1,2 @@
-import { SimpleGauge } from "./Gauges/SimpleGauge";
+export { default as SimpleGauge } from "./Gauges/BaseGauge";
 
-export { SimpleGauge };
