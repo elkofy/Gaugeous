@@ -1,14 +1,15 @@
 import { DEFAULT_VIEWBOX } from "../Types/const";
-import { svgElementCreator, svgAssetCreator } from "../Types/utilsType";
+import { svgElementCreator, svgAssetCreator, GaugeOptions } from "../Types/utilsType";
 export default class BaseGauge {
   value: number;
   maxValue: number;
-  options?: object;
+  options?: GaugeOptions ;
   gauge!: SVGElement;
 
-  constructor(value: number, maxValue: number) {
+  constructor(value: number, maxValue: number, options?: GaugeOptions) {
     this.value = value;
     this.maxValue = maxValue;
+    this.options = options;
   }
 
   getPercentage() {
@@ -17,17 +18,17 @@ export default class BaseGauge {
 
   createGauge() {
     let backgroundRect = svgAssetCreator("rect", {
-      x: 1,
-      y: 1,
+      x: 0,
+      y: 0,
       width: 300,
       height: 50,
       fill: "#f0f0f0",
       stroke: "black",
       strokeWidth: 1,
-    });
+    }); 
     let gaugeRect = svgAssetCreator("rect", {
-      x: 1,
-      y: 1,
+      x: 0,
+      y: 0,
       width: 100,
       height: 50,
       fill: "green",
