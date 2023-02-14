@@ -19,14 +19,20 @@ export const svgElementCreator = (
   return svg;
 };
 
+
 export const svgAssetCreator = (tag: string, options: any): SVGElement => {
   const svg = document.createElementNS(SVGNS, tag);
 
   for (const key in options) {
-    svg.setAttribute(key, options[key]);
+    svg.setAttribute(camelToUnderscore(key), options[key]);
   }
   return svg;
 };
+
+function camelToUnderscore(key: string) {
+  let spacedCamel = key.replace(/([A-Z])/g, " $1");
+  return spacedCamel.split(" ").join("-").toLocaleLowerCase();
+}
 
 export type GaugeOptions = {
   type: string;
