@@ -17,17 +17,25 @@
     <script type="module" src="/src/index.ts"></script>
     <script type="module">
       import { SimpleGauge } from "./src/index.ts";
-      const gauge = new SimpleGauge(60, 100);
-      const gauge2 = new SimpleGauge(20, 100,{
-        type:'none',
+      const gaugevalues = {
+        value: 60,
+        max: 100,
+      };
+      const gauge = new SimpleGauge(gaugevalues);
+      const gauge2values = {
+        value: 20,
+        max: 100,
+      };
+      const gauge2 = new SimpleGauge(gauge2values, {
+        type: "none",
         colors: {
-          backgroundColor: '#FAE4E4',
-          strokeColor: 'black',
-          fillColors:'blue'
+          backgroundColor: "#FAE4E4",
+          strokeColor: "black",
+          fillColors: "blue",
         },
         width: 200,
         height: 20,
-        stroke: 4,
+        radius: 5,
       });
 
       const gaugeContainer = document.getElementById("GaugeContainer");

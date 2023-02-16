@@ -1,23 +1,26 @@
-import { DEFAULT_VIEWBOX } from "../Types/const";
+import {
+  DEFAULT_BACKGROUND_RECT,
+  DEFAULT_GAUGE_RECT,
+  DEFAULT_VIEWBOX,
+} from "../Types/const";
 import {
   svgElementCreator,
   svgAssetCreator,
   GaugeOptions,
+  Gvalues,
 } from "../Types/utilsType";
 export default class BaseGauge {
-  value: number;
-  maxValue: number;
+  values: Gvalues;
   options?: GaugeOptions;
   gauge!: SVGElement;
 
-  constructor(value: number, maxValue: number, options?: GaugeOptions) {
-    this.value = value;
-    this.maxValue = maxValue;
+  constructor(values: Gvalues, options?: GaugeOptions) {
+    this.values = values;
     this.options = options;
   }
 
   getPercentage() {
-    return this.value / this.maxValue;
+    return this.values.value / this.values.max;
   }
 
   createGauge() {
@@ -34,24 +37,8 @@ export default class BaseGauge {
       gaugeRect = svgGaugeElements[1];
       svgViewBox = svgGaugeElements[2];
     } else {
-      backgroundRect = svgAssetCreator("rect", {
-        x: 0,
-        y: 0,
-        width: 300,
-        height: 50,
-        fill: "#f0f0f0",
-        stroke: "black",
-        strokeWidth: 1,
-      });
-      gaugeRect = svgAssetCreator("rect", {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 50,
-        fill: "green",
-        stroke: "black",
-        strokeWidth: 1,
-      });
+      backgroundRect = svgAssetCreator("rect", DEFAULT_BACKGROUND_RECT);
+      gaugeRect = svgAssetCreator("rect", DEFAULT_GAUGE_RECT);
       svgViewBox = DEFAULT_VIEWBOX;
     }
 
@@ -65,36 +52,43 @@ export default class BaseGauge {
     gaugeRect: SVGElement | undefined,
     svgViewBox: any
   ): Array<SVGElement> {
-    let { width, height, colors, stroke } = this.options!;
-    let { backgroundColor, strokeColor , fillColors } = colors!;
+    let { width, height, colors } = this.options!;
+    let { backgroundColor, strokeColor, fillColors } = colors!;
+    let stroke = this.options!.stroke || 0;
     let percentage = this.getPercentage();
-    console.log(height);
     backgroundRect = svgAssetCreator("rect", {
-      x: 0,
-      y: 0,
+      x: stroke,
+      y: stroke,
       width: width,
       height: height,
       fill: backgroundColor,
       stroke: strokeColor,
       strokeWidth: stroke,
+      rx: this.options!.radius,
     });
     gaugeRect = svgAssetCreator("rect", {
-      x: 0,
-      y: 0,
+      x: stroke,
+      y: stroke,
       width: width! * percentage,
       height: height,
       fill: fillColors,
       stroke: strokeColor,
       strokeWidth: stroke,
+      rx: this.options!.radius,
     });
+
+    Array.isArray(this.options!.cssClass)
+      ? (this.options!.cssClass = this.options!.cssClass.join(" "))
+      : (this.options!.cssClass = this.options!.cssClass);
+
     svgViewBox = {
-      width: width!,
-      height: height!,
-      viewBox: `0 0 ${width} ${height}`,
+      width: width! + stroke,
+      height: height! + stroke,
+      viewBox: `0 0 ${width! + stroke * 2} ${height! + stroke * 2}`,
       preserveAspectRatio: "none",
+      class: this.options!.cssClass,
+      id: this.options!.id,
     };
-
-
 
     return [backgroundRect, gaugeRect, svgViewBox] as Array<SVGElement>;
   }

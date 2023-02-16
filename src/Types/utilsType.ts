@@ -19,13 +19,19 @@ export const svgElementCreator = (
   return svg;
 };
 
-
 export const svgAssetCreator = (tag: string, options: any): SVGElement => {
   const svg = document.createElementNS(SVGNS, tag);
+  options = Object.keys(options).reduce((acc: any, key) => {
+    if (options[key] !== undefined) {
+      acc[key] = options[key];
+    }
+    return acc;
+  }, {});
 
   for (const key in options) {
     svg.setAttribute(camelToUnderscore(key), options[key]);
   }
+
   return svg;
 };
 
@@ -36,7 +42,6 @@ function camelToUnderscore(key: string) {
 
 export type GaugeOptions = {
   type: string;
-  values?: Gvalues;
   width?: number;
   height?: number;
   radius?: number;
@@ -58,8 +63,8 @@ export type Gcolors = {
 
 export type Gvalues = {
   value: number;
-  maxValue: number;
-  minValue: number;
+  max: number;
+  min?: number;
   percentage?: number;
 };
 
