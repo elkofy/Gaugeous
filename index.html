@@ -4,18 +4,51 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>Gaugeous</title>
   </head>
   <body>
     <div id="app">
       <div>
         <h1>Gaugeous</h1>
-        
-        <script type="module">
-          // This is to test gauges
-        </script>
+        <div id="GaugeContainer"></div>
       </div>
     </div>
+
     <script type="module" src="/src/index.ts"></script>
+    <script type="module">
+      import { SimpleGauge } from "./src/index.ts";
+      const gaugevalues = {
+        value: 60,
+        max: 100,
+      };
+      const gauge = new SimpleGauge(gaugevalues);
+      const gauge2values = {
+        value: 20,
+        max: 100,
+      };
+      const gauge2 = new SimpleGauge(gauge2values, {
+        type: "none",
+        colors: {
+          backgroundColor: "#FAE4E4",
+          strokeColor: "black",
+          fillColors: "blue",
+        },
+        width: 200,
+        height: 20,
+        radius: 5,
+      });
+
+      const gaugeContainer = document.getElementById("GaugeContainer");
+      gauge.render(gaugeContainer);
+      gauge2.render(gaugeContainer);
+    </script>
+
+    <style>
+      #GaugeContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+    </style>
   </body>
 </html>
