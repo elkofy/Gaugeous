@@ -12,7 +12,7 @@ import {
 export default class BaseGauge {
   values: Gvalues;
   options?: GaugeOptions;
-  gauge!: SVGElement;
+  gauge: SVGElement | undefined;
 
   constructor(values: Gvalues, options?: GaugeOptions) {
     this.values = values;
@@ -93,8 +93,13 @@ export default class BaseGauge {
     return [backgroundRect, gaugeRect, svgViewBox] as Array<SVGElement>;
   }
 
+  getGauge() {
+    return this.gauge;
+  }
+
   render(element: HTMLElement) {
     this.createGauge();
-    element.appendChild(this.gauge);
+    console.log(this.getGauge())
+    element.appendChild(this.getGauge());
   }
 }

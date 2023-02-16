@@ -17,6 +17,7 @@
     <script type="module" src="/src/index.ts"></script>
     <script type="module">
       import { SimpleGauge } from "./src/index.ts";
+      import { GradientGauge } from "./src/index.ts";
       const gaugevalues = {
         value: 60,
         max: 100,
@@ -37,10 +38,22 @@
         height: 20,
         radius: 5,
       });
+      const GradGauge = new GradientGauge(gaugevalues, {
+        type: "none",
+        colors: {
+          backgroundColor: "#FAE4E4",
+          strokeColor: "black",
+          fillColors: "blue",
+        },
+        width: 200,
+        height: 20,
+        radius: 5,
+      })
 
       const gaugeContainer = document.getElementById("GaugeContainer");
       gauge.render(gaugeContainer);
       gauge2.render(gaugeContainer);
+      GradGauge.render(gaugeContainer);
     </script>
 
     <style>
